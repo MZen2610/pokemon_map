@@ -1,7 +1,7 @@
 import folium
 
 from django.http import HttpResponseNotFound
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from .models import Pokemon, PokemonEntity
 
@@ -76,39 +76,35 @@ def previous_and_next_evolution(request, type_evolution, text_evolution: str):
 
 
 def show_pokemon(request, pokemon_id):
-    pokemons = Pokemon.objects.all()
+    pokemon = get_object_or_404(Pokemon, pk=pokemon_id)
+    if pokemon:
+        img_url = request.build_absolute_uri(pokemon.photo.url) if \
+            pokemon.photo else ''
 
-    for pokemon in pokemons:
+        previous_evolution = previous_and_next_evolution(request,
+                                                         pokemon.previous_evolution,
+                                                         'previous_evolution')
 
-        if pokemon.id == int(pokemon_id):
-            requested_pokemon = pokemon
-            img_url = request.build_absolute_uri(pokemon.photo.url) if \
-                pokemon.photo else ''
+        next_evolutions = previous_and_next_evolution(request,
+                                                      pokemon.next_evolutions,
+                                                      'next_evolutions')
 
-            previous_evolution = previous_and_next_evolution(request,
-                                                             pokemon.previous_evolution,
-                                                             'previous_evolution')
-
-            next_evolutions = previous_and_next_evolution(request,
-                                                          pokemon.next_evolutions,
-                                                          'next_evolutions')
-
-            pokemon = {
-                "pokemon_id": pokemon.id,
-                "title_ru": pokemon.title,
-                "img_url": img_url,
-                "description": pokemon.description,
-                "title_en": pokemon.title_en,
-                "title_jp": pokemon.title_jp,
-                "previous_evolution": previous_evolution,
-                "next_evolution": next_evolutions,
-            }
-            break
+        pokemon_dict = {
+            "pokemon_id": pokemon.id,
+            "title_ru": pokemon.title,
+            "img_url": img_url,
+            "description": pokemon.description,
+            "title_en": pokemon.title_en,
+            "title_jp": pokemon.title_jp,
+            "previous_evolution": previous_evolution,
+            "next_evolution": next_evolutions,
+        }
     else:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-    pokemon_entities = PokemonEntity.objects.filter(pokemon=requested_pokemon)
+    pokemon_entities = PokemonEntity.objects.filter(pokemon=pokemon)
+
     for pokemon_entity in pokemon_entities:
         image_url = request.build_absolute_uri(
             pokemon_entity.pokemon.photo.url) if pokemon_entity.pokemon.photo else ''
@@ -121,4 +117,4 @@ def show_pokemon(request, pokemon_id):
 
     return render(request, "pokemon.html",
                   context={'map': folium_map._repr_html_(),
-                           'pokemon': pokemon})
+                           'pokemon': pokemon_dict})
