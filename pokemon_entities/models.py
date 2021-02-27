@@ -13,7 +13,7 @@ class Pokemon(models.Model):
     title_jp = models.CharField(max_length=200, blank=True,
                                 verbose_name='Наименование яп.')
     previous_evolution = models.ForeignKey("Pokemon",
-                                           on_delete=models.CASCADE,
+                                           on_delete=models.SET_NULL,
                                            verbose_name='Из кого эволюционировал',
                                            null=True,
                                            blank=True,
