@@ -77,30 +77,29 @@ def previous_and_next_evolution(request, type_evolution, text_evolution: str):
 
 def show_pokemon(request, pokemon_id):
     pokemon = get_object_or_404(Pokemon, pk=pokemon_id)
-    if pokemon:
-        img_url = request.build_absolute_uri(pokemon.photo.url) if \
-            pokemon.photo else ''
 
-        previous_evolution = previous_and_next_evolution(request,
-                                                         pokemon.previous_evolution,
-                                                         'previous_evolution')
+    img_url = request.build_absolute_uri(pokemon.photo.url) if \
+        pokemon.photo else ''
 
-        next_evolutions = previous_and_next_evolution(request,
-                                                      pokemon.next_evolutions,
-                                                      'next_evolutions')
+    previous_evolution = previous_and_next_evolution(request,
+                                                     pokemon.previous_evolution,
+                                                     'previous_evolution')
 
-        pokemon_dict = {
-            "pokemon_id": pokemon.id,
-            "title_ru": pokemon.title,
-            "img_url": img_url,
-            "description": pokemon.description,
-            "title_en": pokemon.title_en,
-            "title_jp": pokemon.title_jp,
-            "previous_evolution": previous_evolution,
-            "next_evolution": next_evolutions,
-        }
-    else:
-        return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
+    next_evolutions = previous_and_next_evolution(request,
+                                                  pokemon.next_evolutions,
+                                                  'next_evolutions')
+
+    pokemon_dict = {
+        "pokemon_id": pokemon.id,
+        "title_ru": pokemon.title,
+        "img_url": img_url,
+        "description": pokemon.description,
+        "title_en": pokemon.title_en,
+        "title_jp": pokemon.title_jp,
+        "previous_evolution": previous_evolution,
+        "next_evolution": next_evolutions,
+    }
+
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     pokemon_entities = PokemonEntity.objects.filter(pokemon=pokemon)
