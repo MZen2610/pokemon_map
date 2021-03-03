@@ -89,7 +89,7 @@ def show_pokemon(request, pokemon_id):
                                                   pokemon.next_evolutions,
                                                   'next_evolutions')
 
-    pokemon_dict = {
+    pokemon_characteristics = {
         "pokemon_id": pokemon.id,
         "title_ru": pokemon.title,
         "img_url": img_url,
@@ -116,4 +116,4 @@ def show_pokemon(request, pokemon_id):
 
     return render(request, "pokemon.html",
                   context={'map': folium_map._repr_html_(),
-                           'pokemon': pokemon_dict})
+                           'pokemon': pokemon_characteristics})
