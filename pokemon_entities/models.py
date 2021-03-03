@@ -29,8 +29,8 @@ class Pokemon(models.Model):
 
 
 class PokemonEntity(models.Model):
-    pokemon = models.ForeignKey('Pokemon', on_delete=models.SET_NULL,
-                                verbose_name='Покемон', null=True,
+    pokemon = models.ForeignKey('Pokemon', on_delete=models.PROTECT,
+                                verbose_name='Покемон', null=True, blank=True,
                                 related_name='+')
     lat = models.FloatField(verbose_name='Широта')
     lon = models.FloatField(verbose_name='Долгота')
@@ -51,4 +51,4 @@ class PokemonEntity(models.Model):
     class Meta:
         verbose_name = 'Характеристики покемона'
         verbose_name_plural = 'Характеристики покемонов'
-        ordering = ['pk']
+
